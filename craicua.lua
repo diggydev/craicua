@@ -24,12 +24,15 @@ end
 
 function Scenario:evaluate(statement)
    for statement_key,statement_value in ipairs(links) do
-      local text_to_match = string.gsub(statement_value.description,"{}",".+")
+      local text_to_match = string.gsub(statement_value.description,"<>",".+")
+      --print("text_to_match "..text_to_match)
       local sargs = {}
+      --print("statement "..statement)
       if statement:match(text_to_match) then
 	 local index = 1
-	 for sarg in string.gmatch(statement, "=[^%s]+") do
-	    load("temp="..sarg:sub(2,#sarg))()
+	 for sarg in string.gmatch(statement, "<.+>") do
+	    --print("sarg "..sarg)
+	    load("temp="..sarg:sub(2,#sarg-1))()
 	    sargs[index]=temp
 	    index = index + 1
 	 end
@@ -68,10 +71,11 @@ function craicua_run(stories_file_name)
 
    for feature_key,feature_value in ipairs(features) do
       io.write("=== Feature "..feature_key..": "..feature_value.name.." ===\n")
+      local pass_count = 0
       for scenario_key,scenario_value in ipairs(feature_value.scenarios) do
 	 local status, retval = pcall(run, scenario_value)
 	 if status then
-	    io.write("PASS: Scenario "..scenario_key..": "..scenario_value.name.."\n\n")
+	    pass_count = pass_count + 1
 	 else
 	    io.write("FAIL: Scenario "..scenario_key..": "..scenario_value.name..
 		     "\nGiven "..scenario_value.given..
@@ -79,6 +83,7 @@ function craicua_run(stories_file_name)
 		     "\nThen "..scenario_value.then_..
 		     "\nResult: "..retval.."\n\n")
 	 end
-      end    
+      end
+      io.write("Passes: "..pass_count.."/"..#feature_value.scenarios.."\n")
    end
 end
