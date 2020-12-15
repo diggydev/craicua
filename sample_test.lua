@@ -16,7 +16,25 @@ link("it counts the size",
 
 link("the result is <>",
      function (scenario,sarg)
-	assert(scenario.result == sarg[1])
+	assert_eq(scenario.result, sarg[1])
+     end
+)
+
+link("the word <>",
+     function (scenario,sarg)
+	scenario.word = sarg[1]
+     end
+)
+
+link("it is split",
+     function(scenario,sarg)
+	scenario.result = split_word(sarg[1])
+     end
+)
+
+link("part <> is <>",
+     function(scenario,sarg)
+	assert_eq(scenario.result[sarg[1]], 3)
      end
 )
 
@@ -38,5 +56,12 @@ Scenario: Counting an empty table
 Given a table <{}>
 When it counts the size
 Then the result is <0>
+
+Feature: Splitting a word in half (not working yet)
+Scenario: A word with an even number of letters
+Given the word <bubble>
+When it is split
+Then part <1> is <bub>
+And part <2> is <ble>
 --]]
 
